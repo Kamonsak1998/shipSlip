@@ -31,9 +31,11 @@ func Handler(ctx echo.Context) error {
 				switch strings.Split(message.Text, " ")[0] {
 				case "เพิ่มร้าน":
 					log.Println("เพิ่มร้าน->", message.Text)
-					contollers.InsertCustomer(message.Text)
+					contollers.CreateCustomer(message.Text)
 				case "แสดงร้านทั้งหมด":
 					log.Println("แสดงร้านทั้งหมด->", message.Text)
+					customers := contollers.GetAllCustomers()
+					linbotControllers.ReplyMessage(event.ReplyToken, customers)
 				case "แสดงร้าน":
 					log.Println("แสดงร้าน->", message.Text)
 				case "ปริ้น":
