@@ -18,7 +18,7 @@ func ConnectToSqlite() {
 	}
 }
 
-func CreateCustomer(data string) {
+func CreateCustomer(data string) bool {
 	log.Println("Insert customer: ", data)
 	tmp := strings.SplitAfter(data, "(")
 	tmp = strings.Split(tmp[1], ")")
@@ -30,7 +30,9 @@ func CreateCustomer(data string) {
 		Sender:   tmp[3],
 	}); err != nil {
 		log.Println("Insert customer to db err: ", err)
+		return false
 	}
+	return true
 }
 
 func GetAllCustomers() string {
