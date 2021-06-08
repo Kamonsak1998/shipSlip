@@ -1,31 +1,31 @@
 package services
 
 import (
-	"database/sql"
-	// _ "github.com/mattn/go-sqlite3"
+	"log"
+	"shipSlip/models"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type Sqlite struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-// func Connect(dbFile string) (Sqlite, error) {
-// 	con, err := sql.Open("sqlite3", dbFile)
-// 	if err != nil {
-// 		return Sqlite{}, err
-// 	}
-// 	return Sqlite{db: con}, nil
-// }
+func Connect(dbFile string) (Sqlite, error) {
+	db, err := gorm.Open(sqlite.Open(dbFile), &gorm.Config{})
+	if err != nil {
+		return Sqlite{}, err
+	}
+	db.AutoMigrate(&models.Customers{})
+	return Sqlite{db: db}, nil
+}
 
-// func (sqlite *Sqlite) CreateTable() error {
-// 	statement, err := sqlite.db.Prepare("CREATE TABLE IF NOT EXISTS customer (id INT NOT  NULL AUTO_INCREMENT, name TEXT, district TEXT, province TEXT, sender TEXT, PRIMARY KEY (id))")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	statement.Exec()
-// 	return nil
-// }
-
-// func (sqlite *Sqlite) Query() error {
-// 	return nil
-// }
+func (sqlite *Sqlite) Insert(data *models.Customers) error {
+	res := sqlite.db.Create(&data)
+	if res.Error != nil {
+		return res.Error
+	}
+	log.Printf("%+v", res.RowsAffected)
+	return nil
+}

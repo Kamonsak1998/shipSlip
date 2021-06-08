@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"log"
+	contollers "shipSlip/controllers"
 	linbotControllers "shipSlip/controllers"
 	linbotService "shipSlip/services"
 	"strings"
@@ -30,6 +31,7 @@ func Handler(ctx echo.Context) error {
 				switch strings.Split(message.Text, " ")[0] {
 				case "เพิ่มร้าน":
 					log.Println("เพิ่มร้าน->", message.Text)
+					contollers.InsertCustomer(message.Text)
 				case "แสดงร้านทั้งหมด":
 					log.Println("แสดงร้านทั้งหมด->", message.Text)
 				case "แสดงร้าน":
@@ -38,7 +40,7 @@ func Handler(ctx echo.Context) error {
 					log.Println("ปริ้น->", message.Text)
 				default:
 					log.Print("default->", message.Text)
-					replyMsg := fmt.Sprint("กรุณาเลือกคำสั่งตามด้านล่าง:\n-เพิ่มร้าน\n-แสดงร้านทั้งหมด\n-แสดงร้าน\n-ปริ้น")
+					replyMsg := "กรุณาเลือกคำสั่งตามด้านล่าง:\n-เพิ่มร้าน\n-แสดงร้านทั้งหมด\n-แสดงร้าน\n-ปริ้น"
 					linbotControllers.ReplyMessage(event.ReplyToken, replyMsg)
 				}
 
