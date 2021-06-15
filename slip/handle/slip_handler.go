@@ -43,6 +43,20 @@ func Handler(ctx echo.Context) error {
 					linbotControllers.ReplyMessage(event.ReplyToken, customers)
 				case "แสดงร้าน":
 					log.Println("แสดงร้าน->", message.Text)
+					customer, ok := linbotControllers.GetCustomer(message.Text)
+					if ok {
+						linbotControllers.ReplyMessage(event.ReplyToken, customer)
+					} else {
+						linbotControllers.ReplyMessage(event.ReplyToken, "ไม่มีข้อมูลของร้าน \""+customer+"\"")
+					}
+				case "ลบร้าน":
+					log.Println("ลบร้าน->", message.Text)
+					ok := linbotControllers.DeleteCustomer(message.Text)
+					if ok {
+						linbotControllers.ReplyMessage(event.ReplyToken, "ลบร้านค้า \"สำเร็จ\"")
+					} else {
+						linbotControllers.ReplyMessage(event.ReplyToken, "ลบร้านค้า \"ไม่สำเสร็จ\"")
+					}
 				case "ปริ้น":
 					log.Println("ปริ้น->", message.Text)
 				default:

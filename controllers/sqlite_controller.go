@@ -23,6 +23,10 @@ func CreateCustomer(data string) bool {
 	tmp := strings.SplitAfter(data, "(")
 	tmp = strings.Split(tmp[1], ")")
 	tmp = strings.Split(tmp[0], ".")
+	if len(tmp) < 4 {
+		log.Printf("Insert customer to db err: %v, data: %s", fmt.Errorf("data not complete"), data)
+		return false
+	}
 	if err := sqliteClient.Insert(&models.Customers{
 		Name:     tmp[0],
 		District: tmp[1],
@@ -46,4 +50,33 @@ func GetAllCustomers() string {
 		customerStr += fmt.Sprintf("%d. ร้าน%s อำเภอ%s จังหวัด%s ผู้ส่ง%s\n", index+1, value.Name, value.District, value.Province, value.Sender)
 	}
 	return customerStr
+}
+
+func GetCustomer(name string) (string, bool) {
+	name = strings.Split(name, " ")[1]
+	var customers models.Customers
+	var customerStr string
+	if err := sqliteClient.Query(&customers, &models.Customers{Name: name}); err != nil {
+		log.Println("Query customer err: ", err)
+	}
+	if customers.Name == "" {
+		customerStr = fmt.Sprintf("ข้อมูลร้าน %s\n", customers.Name)
+		return name, false
+	}
+	customerStr = fmt.Sprintf("ข้อมูลร้าน %s\n", customers.Name)
+	customerStr += fmt.Sprintf("อำเภอ %s\n", customers.District)
+	customerStr += fmt.Sprintf("จังหวัด %s\n", customers.Province)
+	customerStr += fmt.Sprintf("ผู้ส่ง %s\n", customers.Sender)
+	return customerStr, true
+}
+
+func DeleteCustomer(name string) bool {
+	name = strings.Split(name, " ")[1]
+	var customers models.Customers
+	RowsAffected, err := sqliteClient.Delete(&customers, &models.Customers{Name: name})
+	if RowsAffected == 0 || err != nil {
+		log.Println("Delete customer err: ", err)
+		return false
+	}
+	return true
 }

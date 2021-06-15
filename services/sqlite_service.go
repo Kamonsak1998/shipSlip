@@ -40,3 +40,19 @@ func (sqlite *Sqlite) QueryAll(data interface{}) error {
 	}
 	return nil
 }
+
+func (sqlite *Sqlite) Query(data, condition interface{}) error {
+	res := sqlite.db.Where(condition).Find(data)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
+
+func (sqlite *Sqlite) Delete(data, condition interface{}) (int64, error) {
+	res := sqlite.db.Where(condition).Delete(data)
+	if res.Error != nil {
+		return res.RowsAffected, res.Error
+	}
+	return res.RowsAffected, nil
+}
