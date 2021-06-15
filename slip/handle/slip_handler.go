@@ -59,6 +59,13 @@ func Handler(ctx echo.Context) error {
 					}
 				case "ปริ้น":
 					log.Println("ปริ้น->", message.Text)
+					customer, ok := linbotControllers.GetCustomer(message.Text)
+					if ok {
+						linbotControllers.GenerateAndPrint(message.Text, customer)
+						linbotControllers.ReplyMessage(event.ReplyToken, "ปริ้นร้านค้า \"สำเร็จ\"")
+					} else {
+						linbotControllers.ReplyMessage(event.ReplyToken, "ปริ้นร้านค้า \""+customer+"\" ไม่สำเร็จ")
+					}
 				default:
 					log.Print("default->", message.Text)
 					replyMsg := "กรุณาเลือกคำสั่งตามด้านล่าง:\n-เพิ่มร้าน\n-แสดงร้านทั้งหมด\n-แสดงร้าน\n-ปริ้น"

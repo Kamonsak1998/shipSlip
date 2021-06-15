@@ -63,7 +63,7 @@ func GetCustomer(name string) (string, bool) {
 		customerStr = fmt.Sprintf("ข้อมูลร้าน %s\n", customers.Name)
 		return name, false
 	}
-	customerStr = fmt.Sprintf("ข้อมูลร้าน %s\n", customers.Name)
+	customerStr = fmt.Sprintf("ร้าน %s\n", customers.Name)
 	customerStr += fmt.Sprintf("อำเภอ %s\n", customers.District)
 	customerStr += fmt.Sprintf("จังหวัด %s\n", customers.Province)
 	customerStr += fmt.Sprintf("ผู้ส่ง %s\n", customers.Sender)
