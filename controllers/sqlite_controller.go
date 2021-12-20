@@ -83,13 +83,13 @@ func ExtractToCustomer(keyword []string, data string) *models.Customers {
 		if len(tmp2) == 1 {
 			return customerData
 		}
-		log.Println("customerData.Name ", customerData.Name)
 		tmp2 = strings.Split(tmp2[1], keyword[2])
 		customerData.District = tmp2[0]
 		if len(tmp2) == 1 {
 			return customerData
 		}
 		tmp2 = strings.Split(tmp2[1], keyword[3])
+		customerData.Province = tmp2[0]
 		customerData.Sender = tmp2[1]
 	}
 	return customerData
