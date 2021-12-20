@@ -19,20 +19,12 @@ func ConnectToSqlite() {
 }
 
 func CreateCustomer(data string) bool {
-	log.Println("Insert customer: ", data)
-	tmp := strings.SplitAfter(data, "(")
-	tmp = strings.Split(tmp[1], ")")
-	tmp = strings.Split(tmp[0], ".")
-	if len(tmp) < 4 {
-		log.Printf("Insert customer to db err: %v, data: %s", fmt.Errorf("data not complete"), data)
-		return false
-	}
-	if err := sqliteClient.Insert(&models.Customers{
-		Name:     tmp[0],
-		District: tmp[1],
-		Province: tmp[2],
-		Sender:   tmp[3],
-	}); err != nil {
+	customerData := ExtractToCustomer(models.KeywordSplitCreate, data)
+	// if len(tmp) < 4 {
+	// 	log.Printf("Insert customer to db err: %v, data: %s", fmt.Errorf("data not complete"), data)
+	// 	return false
+	// }
+	if err := sqliteClient.Insert(customerData); err != nil {
 		log.Println("Insert customer to db err: ", err)
 		return false
 	}
@@ -52,11 +44,12 @@ func GetAllCustomers() string {
 	return customerStr
 }
 
-func GetCustomer(name string) (string, bool) {
-	name = strings.Split(name, " ")[1]
+func GetCustomer(keyword []string, name string) (string, bool) {
+	customerData := ExtractToCustomer(keyword, name)
+
 	var customers models.Customers
 	var customerStr string
-	if err := sqliteClient.Query(&customers, &models.Customers{Name: name}); err != nil {
+	if err := sqliteClient.Query(&customers, &models.Customers{Name: customerData.Name}); err != nil {
 		log.Println("Query customer err: ", err)
 	}
 	if customers.Name == "" {
@@ -71,12 +64,33 @@ func GetCustomer(name string) (string, bool) {
 }
 
 func DeleteCustomer(name string) bool {
-	name = strings.Split(name, " ")[1]
+	customerData := ExtractToCustomer(models.KeywordSplitDelete, name)
+
 	var customers models.Customers
-	RowsAffected, err := sqliteClient.Delete(&customers, &models.Customers{Name: name})
+	RowsAffected, err := sqliteClient.Delete(&customers, &models.Customers{Name: customerData.Name})
 	if RowsAffected == 0 || err != nil {
 		log.Println("Delete customer err: ", err)
 		return false
 	}
 	return true
+}
+
+func ExtractToCustomer(keyword []string, data string) *models.Customers {
+	customerData := &models.Customers{}
+	if tmp := strings.Split(data, keyword[0])[1]; tmp != "" {
+		tmp2 := strings.Split(tmp, keyword[1])
+		customerData.Name = tmp2[0]
+		if len(tmp2) == 1 {
+			return customerData
+		}
+		log.Println("customerData.Name ", customerData.Name)
+		tmp2 = strings.Split(tmp2[1], keyword[2])
+		customerData.District = tmp2[0]
+		if len(tmp2) == 1 {
+			return customerData
+		}
+		tmp2 = strings.Split(tmp2[1], keyword[3])
+		customerData.Sender = tmp2[1]
+	}
+	return customerData
 }

@@ -12,9 +12,9 @@ import (
 
 func GenerateAndPrint(incoming, data string) {
 	numberOfPrint := 1
-	tmp := strings.Split(incoming, " ")
-	if len(tmp) == 3 {
-		number, err := strconv.Atoi(tmp[2])
+	tmp := strings.Split(incoming, "จำนวน")
+	if len(tmp) == 2 {
+		number, err := strconv.Atoi(tmp[1])
 		if err != nil {
 			log.Println("convert string to int err: ", err)
 		}

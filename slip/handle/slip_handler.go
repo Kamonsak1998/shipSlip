@@ -5,6 +5,7 @@ import (
 	"log"
 	contollers "shipSlip/controllers"
 	linbotControllers "shipSlip/controllers"
+	"shipSlip/models"
 	linbotService "shipSlip/services"
 	"strings"
 
@@ -28,8 +29,7 @@ func Handler(ctx echo.Context) error {
 		if event.Type == "message" {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				switch strings.Split(message.Text, " ")[0] {
-				case "เพิ่มร้าน":
+				if strings.HasPrefix(message.Text, models.KeywordSplitCreate[0]) {
 					log.Println("เพิ่มร้าน->", message.Text)
 					ok := contollers.CreateCustomer(message.Text)
 					if ok {
@@ -37,19 +37,19 @@ func Handler(ctx echo.Context) error {
 					} else {
 						linbotControllers.ReplyMessage(event.ReplyToken, "เพิ่มร้านค้า \"ไม่สำเร็จ\"")
 					}
-				case "แสดงร้านทั้งหมด":
+				} else if strings.HasPrefix(message.Text, "แสดงทั้งหมด") {
 					log.Println("แสดงร้านทั้งหมด->", message.Text)
 					customers := contollers.GetAllCustomers()
 					linbotControllers.ReplyMessage(event.ReplyToken, customers)
-				case "แสดงร้าน":
+				} else if strings.HasPrefix(message.Text, models.KeywordSplitShow[0]) {
 					log.Println("แสดงร้าน->", message.Text)
-					customer, ok := linbotControllers.GetCustomer(message.Text)
+					customer, ok := linbotControllers.GetCustomer(models.KeywordSplitShow, message.Text)
 					if ok {
 						linbotControllers.ReplyMessage(event.ReplyToken, customer)
 					} else {
 						linbotControllers.ReplyMessage(event.ReplyToken, "ไม่มีข้อมูลของร้าน \""+customer+"\"")
 					}
-				case "ลบร้าน":
+				} else if strings.HasPrefix(message.Text, models.KeywordSplitDelete[0]) {
 					log.Println("ลบร้าน->", message.Text)
 					ok := linbotControllers.DeleteCustomer(message.Text)
 					if ok {
@@ -57,18 +57,18 @@ func Handler(ctx echo.Context) error {
 					} else {
 						linbotControllers.ReplyMessage(event.ReplyToken, "ลบร้านค้า \"ไม่สำเสร็จ\"")
 					}
-				case "ปริ้น":
+				} else if strings.HasPrefix(message.Text, models.KeywordSplitPrint[0]) {
 					log.Println("ปริ้น->", message.Text)
-					customer, ok := linbotControllers.GetCustomer(message.Text)
+					customer, ok := linbotControllers.GetCustomer(models.KeywordSplitPrint, message.Text)
 					if ok {
 						linbotControllers.GenerateAndPrint(message.Text, customer)
 						linbotControllers.ReplyMessage(event.ReplyToken, "ปริ้นร้านค้า \"สำเร็จ\"")
 					} else {
 						linbotControllers.ReplyMessage(event.ReplyToken, "ปริ้นร้านค้า \""+customer+"\" ไม่สำเร็จ")
 					}
-				default:
+				} else {
 					log.Print("default->", message.Text)
-					replyMsg := "กรุณาเลือกคำสั่งตามด้านล่าง:\n-เพิ่มร้าน\n-แสดงร้านทั้งหมด\n-แสดงร้าน\n-ปริ้น"
+					replyMsg := "กรุณาเลือกคำสั่งตามด้านล่าง:\n-เพิ่ม...\n-แสดงทั้งหมด\n-แสดง...\n-ลบ...\n-ปริ้น..."
 					linbotControllers.ReplyMessage(event.ReplyToken, replyMsg)
 				}
 
