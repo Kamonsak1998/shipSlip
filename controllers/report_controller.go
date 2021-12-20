@@ -41,13 +41,17 @@ func GenerateAndPrint(incoming, data string) {
 		Horizontal: "left",
 		Vertical:   "center",
 	}
+	style.ApplyFont = true
+	row = sheet.AddRow()
 	cell = row.AddCell()
-	for i := 0; i < 8*numberOfPrint; i++ {
+	for i := 0; i < 6*numberOfPrint; i++ {
 		cell = sheet.Cell(i*6, 0)
+		cell.Row.SetHeight(50)
 		cell.SetStyle(style)
 		cell.Merge(2, 3)
 		cell.Value = data
 		cell = sheet.Cell(i*6, 4)
+		cell.Row.SetHeight(50)
 		cell.SetStyle(style)
 		cell.Merge(2, 3)
 		cell.Value = data
